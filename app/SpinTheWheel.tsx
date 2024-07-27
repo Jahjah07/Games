@@ -3,10 +3,10 @@ import { View, TouchableOpacity, Text, Modal, Image, ImageBackground, StyleSheet
 import Svg, { Circle, ClipPath, Defs, G, Path } from 'react-native-svg';
 import { Audio } from 'expo-av';
 import { segments } from "../data";
+import WinningModal from './components/WinningModal';
 
 const radius = 150;
 const initialRotation = 90;
-const confettiImage = require('../assets/spinthewheel/confetti.gif');
 const imageSize = 50;
 
 const CircleSpinner: React.FC = () => {
@@ -99,9 +99,6 @@ const CircleSpinner: React.FC = () => {
     }, spinDuration);
   }, [soundObject, isSpinSoundLoaded]);
 
-  
-
-
   const renderImage = (): React.ReactNode[] => {
     return segments.map((segment: { imagePath: any; }, index: number) => {
       const segmentAngle = 360 / segments.length;
@@ -165,37 +162,6 @@ const CircleSpinner: React.FC = () => {
     }
   };
 
-  const YourModalComponent: React.FC<{ winningColor: string | null; onClose: () => void; }> = ({ winningColor, onClose }) => {
-    useEffect(() => {
-      if (isConfettiSoundLoaded && confettiSoundObject) {
-        confettiSoundObject.playAsync();
-      }
-    }, [isConfettiSoundLoaded, confettiSoundObject]);
-
-    return (
-      <Modal animationType="slide" transparent={true} visible={true} onRequestClose={onClose}>
-        <Image source={confettiImage} style={styles.confettiImage} />
-        <View style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: '#ccc',
-          height: 200,
-          width: 300,
-          alignSelf: 'center',
-          marginTop: '80%',
-          borderRadius: 5,
-        }}>
-          <Text style={{ fontSize: 32, fontWeight: 'bold', color: winningColor ? winningColor : '#000' }}>
-            You Won: {winningColor}!
-          </Text>
-          <TouchableOpacity onPress={onClose} style={{ marginTop: 20, padding: 10, backgroundColor: '#007bff' }}>
-            <Text style={{ color: 'white' }}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    );
-  };
-
   return (
     <ImageBackground
       source={require('../assets/spinthewheel/Background.png')}
@@ -234,22 +200,15 @@ const CircleSpinner: React.FC = () => {
           <Text style={{ color: 'white' }}>{isSpinning ? 'Spinning...' : 'SPIN'}</Text>
         </TouchableOpacity>
         {isModalVisible && winningColor !== null && (
-          <YourModalComponent winningColor={winningColor} onClose={() => setIsModalVisible(false)} />
+          <WinningModal 
+            winningColor={winningColor} 
+            isVisible={isModalVisible} 
+            onClose={() => setIsModalVisible(false)} 
+          />
         )}
       </View>
     </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  confettiImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    opacity: 0.5,
-  },
-});
 
 export default CircleSpinner;
