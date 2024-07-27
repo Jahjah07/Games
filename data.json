@@ -1,0 +1,10 @@
+{
+    "segments": [
+      {"name": "Apple", "color": "red", "imagePath": "../assets/sliding_tiles/apple.jpg" },
+      {"name": "Kiwi", "color": "orange", "imagePath": "../assets/sliding_tiles/kiwi.jpg" },
+      {"name": "Orange", "color": "yellow", "imagePath": "../assets/sliding_tiles/orange.jpg" },
+      {"name": "Apples", "color": "green", "imagePath": "../assets/sliding_tiles/apple.jpg" },
+      {"name": "Kiwis", "color": "blue", "imagePath": "../assets/sliding_tiles/kiwi.jpg" },
+      {"name": "Dragon Fruit", "color": "purple", "imagePath": "../assets/sliding_tiles/dragon-fruit.jpg" }
+    ]
+  }
