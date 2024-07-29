@@ -26,6 +26,7 @@ export default InputBox;
 
 const styles = StyleSheet.create({
   inputContainer: {
+    marginTop: '20%',
     backgroundColor: colors.inputBox,
     borderRadius: 8,
     padding: 16,
@@ -34,7 +35,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   text: {
-    color: '#fff',
+    color: '#000',
     fontSize: 18,
     fontWeight: '600',
     letterSpacing: 3,

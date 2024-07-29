@@ -1,4 +1,4 @@
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ImageBackground, StyleSheet, View, useWindowDimensions, Image } from 'react-native';
 import React, { useState } from 'react';
 import Header from './Header';
 import ManFigure from './ManFigure';
@@ -64,16 +64,30 @@ const Index = () => {
 
   const { width } = useWindowDimensions();
   return (
+    <ImageBackground
+      source={require('../../assets/hangman/Background.png')}
+      style={{ width: '100%', height: '100%' }}
+    >
     <View style={width > 600 ? styles.rowDesktop : styles.rowMobile}>
-      <Header />
-      <View style={styles.row}>
-        <ManFigure wrongWord={wrongLetters.length} />
-        <WordBox wordData={WordsArray[currentIndex]} />
+    <Image
+        source={require('../../assets/hangman/title colored.png')}
+        style={{ width: '100%', height: '90%', position: 'absolute',}}
+      />
+      <View style={styles.upper}>
+        <View style={styles.shark}>
+          <ManFigure wrongWord={wrongLetters.length} />
+        </View>
+        <View style={styles.row}>
+          <WordBox wordData={WordsArray[currentIndex]} />
+        </View>
       </View>
+      <View style={styles.lower}>
       <InputBox correctLetters={correctLetters} answer={correctWord} />
       <Keyboard correctLetters={correctLetters} wrongLetters={wrongLetters} onPress={(input: any) => storeCorrectLetters(input)} />
       <StatusPopup status={status} onPress={handlePopupButton} />
+      </View>
     </View>
+    </ImageBackground>
   );
 };
 
@@ -83,16 +97,27 @@ const styles = StyleSheet.create({
   rowMobile: {
     flex: 1,
     marginHorizontal: '5%',
-    width: '90%',
   },
   rowDesktop: {
     flex: 1,
     marginHorizontal: '5%',
     width: '50%',
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  shark: {
+    position: 'absolute',
+    top: 80, // Adjust as needed
+    left: 0
   },
+  row: {
+    maxWidth: 500,
+    position: 'absolute',
+    top: 20, // Adjust as needed
+    left: 200
+  },
+  upper: {
+    marginTop: '50%',
+  },
+  lower: {
+    marginTop: 190,
+  }
 });

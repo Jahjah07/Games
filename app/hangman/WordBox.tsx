@@ -37,7 +37,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.wordBox,
     padding: 10,
     borderRadius: 10,
-    maxWidth: '50%',
+    opacity: .8,
+    justifyContent: 'center',
+    width: 175,
   },
   word: {
     fontSize: 20,

@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, TouchableOpacity, Text, Modal, Image, ImageBackground, StyleSheet, ColorValue } from 'react-native';
+import { View, TouchableOpacity, Text, Image, ImageBackground, StyleSheet, ColorValue } from 'react-native';
 import Svg, { Circle, ClipPath, Defs, G, Path } from 'react-native-svg';
 import { Audio } from 'expo-av';
 import { segments } from "../data";
 import WinningModal from './components/WinningModal';
+import Bubble from './components/Bubble';
 
 const radius = 150;
 const initialRotation = 90;
@@ -17,7 +18,7 @@ const CircleSpinner: React.FC = () => {
   const [soundObject, setSoundObject] = useState<Audio.Sound | null>(null);
   const [confettiSoundObject, setConfettiSoundObject] = useState<Audio.Sound | null>(null);
   const [isSpinSoundLoaded, setIsSpinSoundLoaded] = useState(false);
-  const [isConfettiSoundLoaded, setIsConfettiSoundLoaded] = useState(false);
+  const [attempts, setAttempts] = useState(3); // Add state for attempts
 
   const centerX = 150;
   const centerY = 150;
@@ -32,7 +33,6 @@ const CircleSpinner: React.FC = () => {
         setSoundObject(spinSound.sound);
         setConfettiSoundObject(confettiSound.sound);
         setIsSpinSoundLoaded(true);
-        setIsConfettiSoundLoaded(true);
       } catch (error) {
         console.error('Error loading sounds:', error);
       }
@@ -47,10 +47,14 @@ const CircleSpinner: React.FC = () => {
   }, []);
 
   const spinWheel = useCallback(() => {
+    if (attempts <= 0) {
+      return; // Do nothing if no attempts left
+    }
+
     const spinDuration = Math.random() * 5000 + 2000;
     let startTime = Date.now();
     let animationId = null;
-  
+
     const easeOutCubic = (t: number) => {
       return 1 - Math.pow(1 - t, 3);
     };
@@ -81,12 +85,12 @@ const CircleSpinner: React.FC = () => {
       if (soundObject) {
         soundObject.stopAsync().catch(error => console.error('Error stopping spin sound:', error));
       }
-  
+
       setAngle((prevAngle) => {
         const segmentAngle = 360 / segments.length;
         const finalSegmentAngle = (prevAngle + 360) % 360;
         const segmentIndex = Math.floor(finalSegmentAngle / segmentAngle);
-  
+
         if (segmentIndex >= 0 && segmentIndex < segments.length) {
           setWinningColor(segments[segmentIndex].name);
         } else {
@@ -96,8 +100,11 @@ const CircleSpinner: React.FC = () => {
         setIsModalVisible(true);
         return prevAngle;
       });
+      
+      // Decrement attempts
+      setAttempts((prevAttempts) => prevAttempts - 1);
     }, spinDuration);
-  }, [soundObject, isSpinSoundLoaded]);
+  }, [soundObject, isSpinSoundLoaded, attempts]);
 
   const renderImage = (): React.ReactNode[] => {
     return segments.map((segment: { imagePath: any; }, index: number) => {
@@ -156,7 +163,7 @@ const CircleSpinner: React.FC = () => {
   };
 
   const handleSpin = () => {
-    if (!isSpinning) {
+    if (!isSpinning && attempts > 0) {
       setIsSpinning(true);
       spinWheel();
     }
@@ -168,17 +175,16 @@ const CircleSpinner: React.FC = () => {
       style={{ width: '100%', height: '100%' }}
     >
       <Image
-          source={require('../assets/spinthewheel/title.png')}
-          style={{ width: '100%', height: '120%', position: 'absolute', top: 10, marginTop: 10,}}
-        />
+        source={require('../assets/spinthewheel/title.png')}
+        style={{ width: '100%', height: '120%', position: 'absolute', top: 10, marginTop: 10,}}
+      />
       <View style={{
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        top: '10%'
+        top: '8%'
       }}>
-        
-
+       
         <Svg width={300} height={300} viewBox="0 0 300 300">
           <Defs>
             <ClipPath id="circleClip">
@@ -194,10 +200,26 @@ const CircleSpinner: React.FC = () => {
 
         <Image
           source={require('../assets/spinthewheel/frame and pointer 2.png')}
-          style={{ width: 300, height: 379, position: 'absolute', top: '26%' }}
+          style={{ width: 300, height: 372, position: 'absolute', top: '25%' }}
         />
-        <TouchableOpacity onPress={handleSpin} style={{ marginTop: 20, backgroundColor: '#007bff', padding: 10, borderRadius: 5 }}>
-          <Text style={{ color: 'white' }}>{isSpinning ? 'Spinning...' : 'SPIN'}</Text>
+         {/* Display attempts left */}
+         <Text style={styles.attemptsText}>
+          Attempts Left: {attempts}
+        </Text>
+        <TouchableOpacity
+          onPress={handleSpin}
+          style={{
+            marginTop: 20,
+            backgroundColor: '#007bff',
+            padding: 10,
+            borderRadius: 5,
+            opacity: attempts > 0 ? 1 : 0.5, // Change opacity based on attempts
+          }}
+          disabled={attempts <= 0} // Disable button if no attempts left
+        >
+          <Text style={{ color: 'white' }}>
+            {isSpinning ? 'Spinning...' : attempts > 0 ? 'SPIN' : 'No Attempts Left'}
+          </Text>
         </TouchableOpacity>
         {isModalVisible && winningColor !== null && (
           <WinningModal 
@@ -206,9 +228,18 @@ const CircleSpinner: React.FC = () => {
             onClose={() => setIsModalVisible(false)} 
           />
         )}
+        {/* <Bubble /> */}
       </View>
     </ImageBackground>
   );
 };
+
+const styles = StyleSheet.create({
+  attemptsText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+});
 
 export default CircleSpinner;
